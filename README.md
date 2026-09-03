@@ -2,13 +2,13 @@
 
 Advanced Algorithms project comparing a deterministic fixed hash
 (`h(k) = k mod m`) against a randomized Carter-Wegman universal hash,
-on the *same* separate-chaining hash table implementation, across
+on the *same* separate chaining hash table implementation, across
 four input distributions.
 
 **Research question:** does randomizing the hash function's
 coefficients per table instance protect against the collision
 patterns that a fixed modulus hash is structurally vulnerable to,
-without materially hurting performance on "well-behaved" inputs?
+without materially hurting performance on "well behaved" inputs?
 
 ## Status
 
@@ -41,7 +41,7 @@ h(k) = ((a*k + b) mod p) mod m
 
 - `p` is prime and larger than the key range in use (defaults to the
   fixed Mersenne prime `2**61 - 1`, validated with a deterministic
-  Miller-Rabin test).
+  Miller Rabin test).
 - `a` is drawn uniformly from `{1, ..., p-1}` (`a != 0`, since `a = 0`
   would collapse `h` to a constant function of `b` alone).
 - `b` is drawn uniformly from `{0, ..., p-1}`.
