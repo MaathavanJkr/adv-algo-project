@@ -22,7 +22,7 @@ class TestComputeChainStats:
         # bucket 1: [1]        (1 key)
         # bucket 2: []         (0 keys)
         # bucket 3: [3, 7]     (2 keys)
-        table = HashTable(size=4, hash_function=make_fixed_hash(4))
+        table = HashTable(size=4, hash_family=[make_fixed_hash(4)])
         for key in [0, 4, 8, 1, 3, 7]:
             table.insert(key)
 
@@ -37,7 +37,7 @@ class TestComputeChainStats:
         assert stats.collision_count == 3
 
     def test_empty_table_all_zero(self) -> None:
-        table = HashTable(size=5, hash_function=make_fixed_hash(5))
+        table = HashTable(size=5, hash_family=[make_fixed_hash(5)])
         stats = compute_chain_stats(table)
         assert stats.max_chain_length == 0
         assert stats.average_chain_length == 0.0
@@ -47,7 +47,7 @@ class TestComputeChainStats:
         assert stats.chain_length_stdev == 0.0
 
     def test_no_collisions_when_evenly_distributed(self) -> None:
-        table = HashTable(size=4, hash_function=make_fixed_hash(4))
+        table = HashTable(size=4, hash_family=[make_fixed_hash(4)])
         for key in [0, 1, 2, 3]:
             table.insert(key)
         stats = compute_chain_stats(table)
@@ -55,7 +55,7 @@ class TestComputeChainStats:
         assert stats.max_chain_length == 1
 
     def test_collision_count_all_in_one_bucket(self) -> None:
-        table = HashTable(size=4, hash_function=constant_hash(0))
+        table = HashTable(size=4, hash_family=[constant_hash(0)])
         for key in [10, 20, 30, 40, 50]:
             table.insert(key)
         stats = compute_chain_stats(table)
@@ -64,7 +64,7 @@ class TestComputeChainStats:
         assert stats.max_chain_length == 5
 
     def test_duplicates_do_not_inflate_collision_count(self) -> None:
-        table = HashTable(size=4, hash_function=constant_hash(0))
+        table = HashTable(size=4, hash_family=[constant_hash(0)])
         table.insert(1)
         table.insert(1)
         table.insert(1)

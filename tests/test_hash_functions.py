@@ -10,7 +10,9 @@ from src.hash_functions import (
     DEFAULT_PRIME,
     UniversalHash,
     fixed_hash,
+    make_fixed_family,
     make_fixed_hash,
+    make_universal_family,
 )
 
 
@@ -140,3 +142,50 @@ class TestUniversalHash:
         h = UniversalHash(m=10, seed=1)
         text = repr(h)
         assert "a=" in text and "b=" in text and "p=" in text and "m=" in text
+
+
+class TestMakeFixedFamily:
+    def test_length_one_containing_fixed_hash(self) -> None:
+        family = make_fixed_family(13)
+        assert len(family) == 1
+        for key in range(50):
+            assert family[0](key) == fixed_hash(key, 13)
+
+    def test_invalid_m_raises(self) -> None:
+        with pytest.raises(ValueError):
+            make_fixed_family(0)
+
+
+class TestMakeUniversalFamily:
+    def test_family_has_k_members(self) -> None:
+        for k in (1, 2, 3, 5):
+            family = make_universal_family(k=k, m=97, seed=1)
+            assert len(family) == k
+            assert all(isinstance(h, UniversalHash) for h in family)
+
+    def test_k_less_than_one_raises(self) -> None:
+        with pytest.raises(ValueError):
+            make_universal_family(k=0, m=10, seed=1)
+        with pytest.raises(ValueError):
+            make_universal_family(k=-1, m=10, seed=1)
+
+    def test_all_members_output_in_range(self) -> None:
+        family = make_universal_family(k=4, m=23, seed=2)
+        for h in family:
+            for key in range(200):
+                assert 0 <= h(key) < 23
+
+    def test_members_are_independent_not_identical(self) -> None:
+        family = make_universal_family(k=6, m=101, seed=9)
+        pairs = {(h.a, h.b) for h in family}
+        assert len(pairs) > 1
+
+    def test_reproducible_given_same_seed(self) -> None:
+        family1 = make_universal_family(k=4, m=101, seed=123)
+        family2 = make_universal_family(k=4, m=101, seed=123)
+        assert [(h.a, h.b) for h in family1] == [(h.a, h.b) for h in family2]
+
+    def test_k1_matches_single_universal_hash_given_same_rng_state(self) -> None:
+        family = make_universal_family(k=1, m=50, seed=77)
+        solo = UniversalHash(m=50, seed=77)
+        assert (family[0].a, family[0].b) == (solo.a, solo.b)

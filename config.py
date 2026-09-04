@@ -9,6 +9,13 @@ TRIALS: int = 30
 LOAD_FACTORS: list[float] = [0.5, 0.75, 1.0, 2.0]
 BASE_SEED: int = 42
 
+# Family sizes (k) to try for universal hashing. k=1 reproduces plain
+# single-function universal hashing exactly; a list so the experiment
+# runner can sweep multiple family sizes in one run.
+UNIVERSAL_K_VALUES: list[int] = [3]
+
+DISTRIBUTIONS: list[str] = ["uniform", "sorted", "adversarial", "near_duplicate"]
+
 
 def table_size_for_load_factor(n: int, alpha: float) -> int:
     """m = ceil(n / alpha), since alpha = n / m."""

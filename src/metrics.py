@@ -6,7 +6,7 @@ import statistics
 from dataclasses import dataclass
 
 from src.datasets import adversarial_dataset
-from src.hash_functions import make_fixed_hash
+from src.hash_functions import make_fixed_family
 from src.hash_table import HashTable
 
 
@@ -43,7 +43,7 @@ def validate_adversarial_concentration(n: int, m: int) -> int:
     """Check that the adversarial dataset all lands in bucket 0 under
     fixed hashing, and return the resulting max chain length."""
     keys = adversarial_dataset(n, m)
-    table = HashTable(size=m, hash_function=make_fixed_hash(m))
+    table = HashTable(size=m, hash_family=make_fixed_family(m))
     for key in keys:
         table.insert(key)
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import random
 from functools import partial
-from typing import Callable
+from typing import Callable, List
 
 # Mersenne prime, comfortably bigger than any key this project uses.
 DEFAULT_PRIME = (1 << 61) - 1
@@ -57,6 +57,12 @@ def make_fixed_hash(m: int) -> Callable[[int], int]:
     if m < 1:
         raise ValueError(f"m must be >= 1, got {m}")
     return partial(fixed_hash, m=m)
+
+
+def make_fixed_family(m: int) -> List[Callable[[int], int]]:
+    """Fixed hashing as a family of size 1, so HashTable can treat both
+    strategies through the same list-of-callables interface."""
+    return [make_fixed_hash(m)]
 
 
 class UniversalHash:
@@ -110,3 +116,26 @@ class UniversalHash:
 
     def __repr__(self) -> str:
         return f"UniversalHash(a={self.a}, b={self.b}, p={self.p}, m={self.m})"
+
+
+def make_universal_family(
+    k: int,
+    m: int,
+    p: int = DEFAULT_PRIME,
+    rng: random.Random | None = None,
+    seed: int | None = None,
+) -> List[UniversalHash]:
+    """A family of k independently-parameterized universal hash
+    functions, all mapping into the same m-bucket array.
+
+    Each member draws its own (a, b) once at construction (never per
+    key) by pulling from a single shared generator that advances
+    across members -- so the family as a whole is reproducible from
+    one seed, while its k members still get independent coefficients.
+    k=1 reproduces plain single-function universal hashing exactly.
+    """
+    if k < 1:
+        raise ValueError(f"k must be >= 1, got {k}")
+
+    generator = rng if rng is not None else random.Random(seed)
+    return [UniversalHash(m=m, p=p, rng=generator) for _ in range(k)]
