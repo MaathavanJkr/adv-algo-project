@@ -5,6 +5,7 @@ from __future__ import annotations
 import time
 import random
 from dataclasses import dataclass
+from pathlib import Path
 
 import config
 from src.datasets import uniform_dataset, sorted_dataset, adversarial_dataset, near_duplicate_dataset
@@ -49,11 +50,13 @@ def run_all_experiments() -> list[ExperimentResult]:
         for alpha in config.LOAD_FACTORS:
             m = config.table_size_for_load_factor(n, alpha)
             for dataset_name in dataset_names:
+                all_trials_keys = []
                 for trial in range(config.TRIALS):
                     # Derive per-trial seed
                     seed = config.BASE_SEED + trial
                     
                     keys = _generate_keys(dataset_name, n, m, seed)
+                    all_trials_keys.append(keys)
                     
                     # 1. Fixed Hash
                     fixed_table = HashTable(size=m, hash_function=make_fixed_hash(m))
@@ -111,6 +114,16 @@ def run_all_experiments() -> list[ExperimentResult]:
                         search_time=univ_search_time,
                         stats=univ_stats
                     ))
+                    
+                # Output combined dataset for this parameter combination
+                dataset_dir = Path("results/datasets")
+                dataset_dir.mkdir(parents=True, exist_ok=True)
+                dataset_file = dataset_dir / f"{dataset_name}_n{n}_m{m}.csv"
+                with open(dataset_file, "w") as f:
+                    headers = ",".join(f"trial_{t}" for t in range(config.TRIALS))
+                    f.write(headers + "\n")
+                    for row in zip(*all_trials_keys):
+                        f.write(",".join(map(str, row)) + "\n")
                     
     return results
 

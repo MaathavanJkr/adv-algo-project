@@ -40,7 +40,7 @@ def near_duplicate_dataset(n: int, seed: int | None = None) -> list[int]:
     if n == 0:
         return []
 
-    pool_size = max(1, n // 10)
+    pool_size = max(1, n // 1000)
     pool = list(range(1, pool_size + 1))
     rng = random.Random(seed)
     return [rng.choice(pool) for _ in range(n)]

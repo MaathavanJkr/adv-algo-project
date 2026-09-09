@@ -151,16 +151,14 @@ to this input.
 
 ## Installation
 
-- Python 3.11+ (developed and tested against 3.13). All algorithm
-  code uses the standard library only — `random`, `statistics`,
-  `math`.
-- `pytest` for running the test suite (the only non-stdlib
-  dependency, and only needed to run tests).
+- Python 3.11+ (developed and tested against 3.13). The core algorithm uses only standard library modules.
+- `pytest` for running the test suite.
+- `matplotlib` for generating plots.
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install pytest
+pip install pytest matplotlib
 ```
 
 ## How to run the tests
@@ -212,14 +210,15 @@ and which one I went with (full list with reasoning in
   invalid-parameter cases like `a = 0` can be exercised directly in
   tests, since normal random draws never produce `a = 0`.
 
-## What's next
+## Running Experiments
 
-- `src/experiment.py`: run `config.TRIALS` trials per `(n,
-  load_factor, dataset, hash_strategy)` combination, timing via
-  `time.perf_counter`, reusing the same generated dataset across both
-  hash strategies within a trial.
-- `src/statistics.py`: aggregate those trials into summary tables in
-  `results/*.csv`.
-- `src/visualization.py` + `analyze_results.py`: turn the CSVs into
-  comparison plots (`plots/*.png`) for collisions, chain lengths,
-  search comparisons, and timings.
+To run the full suite of experiments across all datasets, load factors, and hash strategies:
+
+```bash
+python analyze_results.py
+```
+
+This script will:
+1. Run `config.TRIALS` trials per parameter combination.
+2. Aggregate the raw metrics into `results/summary.csv`.
+3. Generate comparison PNG plots for collision counts, max chain lengths, and search times in the `plots/` directory.
