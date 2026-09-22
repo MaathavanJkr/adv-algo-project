@@ -19,15 +19,15 @@ def aggregate_and_save(results: list[ExperimentResult], output_dir: str | Path =
     # Group results by dataset_name, hash_strategy, n, load_factor, m
     grouped = defaultdict(list)
     for r in results:
-        key = (r.dataset_name, r.hash_strategy, r.n, r.load_factor, r.m)
+        key = (r.dataset_name, r.hash_strategy, r.n, r.load_factor, r.m, r.iterations)
         grouped[key].append(r)
         
     aggregated = []
     for key, group in grouped.items():
-        dataset_name, hash_strategy, n, load_factor, m = key
+        dataset_name, hash_strategy, n, load_factor, m, iterations = key
         
-        insert_times = [r.insert_time for r in group]
-        search_times = [r.search_time for r in group]
+        insert_times = [statistics.mean(r.insert_times) for r in group]
+        search_times = [statistics.mean(r.search_times) for r in group]
         max_chain_lengths = [r.stats.max_chain_length for r in group]
         collision_counts = [r.stats.collision_count for r in group]
         
@@ -40,6 +40,7 @@ def aggregate_and_save(results: list[ExperimentResult], output_dir: str | Path =
             "n": n,
             "load_factor": load_factor,
             "m": m,
+            "iterations": iterations,
             "insert_time_mean": statistics.mean(insert_times),
             "insert_time_std": safe_stdev(insert_times),
             "search_time_mean": statistics.mean(search_times),

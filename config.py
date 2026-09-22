@@ -5,7 +5,8 @@ from __future__ import annotations
 import math
 
 N_VALUES: list[int] = [1000, 5000, 10000]
-TRIALS: int = 30
+N_VALUES_CHAIN: list[int] = [10, 100, 1000, 5000, 100000]
+TRIALS: int = 1
 LOAD_FACTORS: list[float] = [0.5, 0.75, 1.0, 2.0]
 BASE_SEED: int = 42
 

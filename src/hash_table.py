@@ -46,22 +46,24 @@ class HashTable:
         """Look up key, counting one comparison per element checked."""
         index = self._bucket_index(key)
         bucket = self.buckets[index]
-        for candidate in bucket:
-            self.comparison_count += 1
-            if candidate == key:
-                return True
-        return False
+        try:
+            idx = bucket.index(key)
+            self.comparison_count += (idx + 1)
+            return True
+        except ValueError:
+            self.comparison_count += len(bucket)
+            return False
 
     def delete(self, key: int) -> bool:
         """Remove key if present. Returns True if it was found."""
         index = self._bucket_index(key)
         bucket = self.buckets[index]
-        for i, candidate in enumerate(bucket):
-            if candidate == key:
-                del bucket[i]
-                self.unique_keys -= 1
-                return True
-        return False
+        try:
+            bucket.remove(key)
+            self.unique_keys -= 1
+            return True
+        except ValueError:
+            return False
 
     def chain_length(self, index: int) -> int:
         if not (0 <= index < self.size):
